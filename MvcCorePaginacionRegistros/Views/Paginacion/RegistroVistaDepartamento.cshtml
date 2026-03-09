@@ -15,6 +15,7 @@
         <li class="list-group-item">
             <a asp-controller="Paginacion"
                asp-action="RegistroVistaDepartamento"
+               class="btn btn-success"
                asp-route-posicion="@ViewData["ANTERIOR"]">
                 Anterior
             </a>
@@ -22,6 +23,7 @@
         <li class="list-group-item">
             <a asp-controller="Paginacion"
                asp-action="RegistroVistaDepartamento"
+               class="btn btn-primary"
                asp-route-posicion="@ViewData["SIGUIENTE"]">
                 Siguiente
             </a>
@@ -29,6 +31,7 @@
         <li class="list-group-item">
             <a asp-controller="Paginacion"
                asp-action="RegistroVistaDepartamento"
+               class="btn btn-dark"
                asp-route-posicion="@ViewData["ULTIMO"]">
                 Ultimo
             </a>

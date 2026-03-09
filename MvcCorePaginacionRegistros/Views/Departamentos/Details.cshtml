@@ -1,0 +1,52 @@
+﻿@model ModelEmpleadosOficio
+
+@{
+    ViewData["Title"] = "Details";
+    Departamento dept = ViewData["DEPT"] as Departamento;
+}
+<ul class="list-group">
+    <li class="list-group-item"><strong>Id Departamento:</strong> @dept.IdDepartamento</li>
+    <li class="list-group-item"><strong>Nombre Departamento:</strong> @dept.Nombre</li>
+    <li class="list-group-item"><strong>Localidad Departamento:</strong> @dept.Localidad</li>
+</ul>
+@{
+    int numRegistros = 0;
+    int numPagina = 1;
+    int iddept = 0;
+    if (dept.IdDepartamento != null)
+    {
+        numRegistros = (int)Model.NumeroRegistros;
+        iddept = dept.IdDepartamento;
+    }
+}
+
+<hr />
+@if (Model != null)
+{
+    <a asp-controller="Departamentos" 
+    asp-action="Details"
+    asp-route-posicion="@ViewData["ANTERIOR"]" 
+    asp-route-iddept="@iddept"
+    class="btn btn-success">Anterior</a>
+    <a asp-controller="Departamentos" 
+    asp-action="Details"
+    asp-route-posicion="@ViewData["SIGUIENTE"]" 
+    asp-route-iddept="@iddept"
+    class="btn btn-primary">Siguiente</a>
+    <a asp-controller="Departamentos" 
+    asp-action="Details"
+    asp-route-posicion="@numRegistros" 
+    asp-route-iddept="@iddept"
+    class="btn btn-dark">Ultimo</a>
+    @foreach (Empleado emp in Model.Empleados)
+    {
+    <ul class="list-group">
+            <li class="list-group-item"><strong>IdEmpleado: </strong> @emp.IdEmpleado</li>
+            <li class="list-group-item"><strong>Apellido: </strong> @emp.Apellido</li>
+            <li class="list-group-item"><strong>Oficio: </strong> @emp.Oficio</li>
+            <li class="list-group-item"><strong>Salario: </strong> @emp.Salario</li>
+            <li class="list-group-item"><strong>IdDepartamento: </strong> @emp.IdDepartamento</li>
+    </ul>
+    }
+}
+
