@@ -1,4 +1,4 @@
-﻿@model List<VistaDepartamento>
+﻿@model List<Departamento>
 @{
     int numRegistros = (int)ViewData["REGISTROS"];
     int numPagina = 1;
@@ -6,16 +6,15 @@
 <h1>Paginacion en grupo</h1>
 @for (int i = 1; i <= numRegistros; i += 2)
 {
-    <a asp-controller="Paginacion" asp-action="GrupoVistaDepartamentos" asp-route-posicion="@i"
-    class="btn btn-primary">Página @numPagina</a>
+    <a asp-controller="Paginacion" asp-action="GrupoDepartamentos" asp-route-posicion="@i"
+       class="btn btn-success">Página @numPagina</a>
     numPagina++;
 }
 <hr />
 <hr />
-<table class="table table-striped">
+<table class="table table-striped table-success">
     <thead>
         <tr>
-            <th>Posicion</th>
             <th>Id</th>
             <th>Nombre</th>
             <th>Localidad</th>
@@ -25,7 +24,6 @@
         @foreach (var departamento in Model)
         {
             <tr>
-                <td>@departamento.Posicion</td>
                 <td>@departamento.IdDepartamento</td>
                 <td>@departamento.Nombre</td>
                 <td>@departamento.Localidad</td>

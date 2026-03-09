@@ -46,13 +46,24 @@ namespace MvcCorePaginacionRegistros.Controllers
             }
             //LO SIGUIENTE SERA QUE DEBEMOS DIBUJAR LOS NUMEROS DE PAGINA EN LOS LINKS
             //VOY A REALIZAR EL DIBUJO DESDE AQUI
-            int numPagina = 1;
             int numRegistros = await this.repo.GetNumeroRegistrosVistaDepartamentosAsync();
-            ViewData["ULTIMO"] = numRegistros;
-            ViewData["NUMPAGINA"] = numPagina;
-            
+            ViewData["REGISTROS"] = numRegistros;
             
             List<VistaDepartamento> departamentos = await this.repo.GetGrupoVistaDepartamentosAsync(posicion.Value);
+            return View(departamentos);
+        }
+        public async Task<IActionResult> GrupoDepartamentos(int? posicion)
+        {
+            if (posicion == null)
+            {
+                posicion = 1;
+            }
+            //LO SIGUIENTE SERA QUE DEBEMOS DIBUJAR LOS NUMEROS DE PAGINA EN LOS LINKS
+            //VOY A REALIZAR EL DIBUJO DESDE AQUI
+            int numRegistros = await this.repo.GetNumeroRegistrosVistaDepartamentosAsync();
+            ViewData["REGISTROS"] = numRegistros;
+
+            List<Departamento> departamentos = await this.repo.GetGrupoDepartamentosAsync(posicion.Value);
             return View(departamentos);
         }
         public IActionResult Index()

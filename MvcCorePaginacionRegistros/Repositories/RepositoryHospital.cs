@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using MvcCorePaginacionRegistros.Data;
 using MvcCorePaginacionRegistros.Models;
 
@@ -21,6 +22,17 @@ GO
 
 SELECT * FROM V_DEPARTAMENTO_INDIVIDUAL
 WHERE POSICION = 1
+-----------------------------------------
+LO MISMO CON UN PROCEDIMIENTO ALMACENADO
+    
+CREATE PROCEDURE SP_GRUPO_DEPARTAMENTOS
+(@posicion int)
+AS
+	SELECT DEPT_NO, DNOMBRE, LOC FROM V_DEPARTAMENTO_INDIVIDUAL
+	WHERE POSICION >= @posicion AND POSICION < (@posicion + 2)
+GO
+
+EXEC SP_GRUPO_DEPARTAMENTOS 1
     */
     #endregion
     public class RepositoryHospital
@@ -46,6 +58,12 @@ WHERE POSICION = 1
                            where datos.Posicion >= posicion && datos.Posicion < posicion + 2
                            select datos;
             return await consulta.ToListAsync();
+        }
+        public async Task<List<Departamento>> GetGrupoDepartamentosAsync(int posicion)
+        {
+            string sql = "EXEC SP_GRUPO_DEPARTAMENTOS @posicion";
+            SqlParameter pamPosicion = new SqlParameter("@posicion", posicion);
+            return await this.context.Departamentos.FromSqlRaw(sql, pamPosicion).ToListAsync();
         }
     }
 }
