@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MvcCorePaginacionRegistros.Models
 {
-    [Table("Empleado")]
+    [Table("EMP")]
     public class Empleado
     {
         [Key]

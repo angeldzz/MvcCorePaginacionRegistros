@@ -33,6 +33,48 @@ AS
 GO
 
 EXEC SP_GRUPO_DEPARTAMENTOS 1
+    ------------------------------------------
+Paginacion de Empleados
+
+CREATE VIEW V_GRUPO_EMPLEADOS
+AS
+	SELECT CAST(ROW_NUMBER() OVER (ORDER BY EMP_NO) AS INT)
+	AS POSICION,EMP_NO, APELLIDO, OFICIO, SALARIO, DEPT_NO FROM EMP
+GO
+SELECT * FROM V_GRUPO_EMPLEADOS
+
+CREATE PROCEDURE SP_GRUPO_EMPLEADOS (@posicion int)
+AS
+	SELECT EMP_NO, APELLIDO, OFICIO, SALARIO, DEPT_NO 
+	FROM V_GRUPO_EMPLEADOS
+	WHERE POSICION >= @posicion AND POSICION < (@posicion + 3)
+GO
+
+	SELECT EMP_NO, APELLIDO, OFICIO, SALARIO, DEPT_NO 
+	FROM V_GRUPO_EMPLEADOS
+	WHERE POSICION >= 2 AND POSICION < (2 + 3)
+
+EXEC SP_GRUPO_EMPLEADOS 1
+EXEC SP_GRUPO_EMPLEADOS 4
+    ---------------------------------------------
+    PARA FILTRAR NO PODEMOS USAR LA VISTA
+    DEBEMOS USAR EL PROCEDIMIENTO ALMACENADO CON PARAMETROS
+    ---------------------------------------------
+
+CREATE PROCEDURE SP_GRUPO_EMPLEADOS_OFICIO
+(@posicion int , @oficio nvarchar(50), @registros int out)
+AS
+	--almacenamos el numero de registros filtrados
+	SELECT @registros = COUNT(EMP_NO) from EMP WHERE OFICIO = @oficio
+	SELECT EMP_NO,APELLIDO, OFICIO, SALARIO, DEPT_NO FROM
+	(SELECT CAST(ROW_NUMBER() OVER (ORDER BY EMP_NO) AS INT) AS POSICION,
+	EMP_NO, APELLIDO, OFICIO, SALARIO, DEPT_NO 
+	FROM V_GRUPO_EMPLEADOS
+	WHERE OFICIO=@oficio) QUERY
+	WHERE QUERY.POSICION >= @posicion AND QUERY.POSICION < (@posicion + 3)
+GO
+
+EXEC SP_GRUPO_EMPLEADOS_OFICIO 1, 'ANALISTA'
     */
     #endregion
     public class RepositoryHospital
@@ -61,9 +103,50 @@ EXEC SP_GRUPO_DEPARTAMENTOS 1
         }
         public async Task<List<Departamento>> GetGrupoDepartamentosAsync(int posicion)
         {
-            string sql = "EXEC SP_GRUPO_DEPARTAMENTOS @posicion";
+            string sql = "SP_GRUPO_DEPARTAMENTOS @posicion";
             SqlParameter pamPosicion = new SqlParameter("@posicion", posicion);
             return await this.context.Departamentos.FromSqlRaw(sql, pamPosicion).ToListAsync();
+        }
+        public async Task<int> GetEmpleadosCountAsync()
+        {
+            return await context.Empleados.CountAsync();
+        }
+        public async Task<List<Empleado>> GetGrupoEmpleadosAsync(int posicion)
+        {
+            string sql = "SP_GRUPO_EMPLEADOS @posicion";
+            SqlParameter pamPosicion = new SqlParameter("@posicion", posicion);
+            return await this.context.Empleados.FromSqlRaw(sql, pamPosicion).ToListAsync();
+        }
+        public async Task<int> GetEmpleadosOficioCountAsync(string oficio)
+        {
+            return await this.context.Empleados.Where(e => e.Oficio == oficio).CountAsync();
+        }
+        public async Task<List<Empleado>> GetGrupoEmpleadosOficioAsync(int posicion, string oficio)
+        {
+            string sql = "SP_GRUPO_EMPLEADOS_OFICIO @posicion, @oficio";
+            SqlParameter pamPosicion = new SqlParameter("@posicion", posicion);
+            SqlParameter pamOficio = new SqlParameter("@oficio", oficio);
+            return await this.context.Empleados.FromSqlRaw(sql, pamPosicion, pamOficio).ToListAsync();
+        }
+        public async Task<ModelEmpleadosOficio> GetGrupoEmpleadosOficioOutAsync(int posicion, string oficio)
+        {
+            string sql = "EXEC SP_GRUPO_EMPLEADOS_OFICIO @posicion, @oficio, @registros out";
+            SqlParameter pamPosicion = new SqlParameter("@posicion", posicion);
+            SqlParameter pamOficio = new SqlParameter("@oficio", oficio);
+            SqlParameter pamRegistros = new SqlParameter("@registros", 0);
+            pamRegistros.DbType = System.Data.DbType.Int32;
+            pamRegistros.Direction = System.Data.ParameterDirection.Output;
+            var consulta = 
+                this.context.Empleados.FromSqlRaw(sql, pamPosicion, pamOficio, pamRegistros);
+            //HASTA QUE NO HEMOS EXTRAIDO LOS DATOS(EMPLEADOS)
+            //NO SE LIBERAN LOS PARAMETROS DE SALIDA
+            List<Empleado> empleados = await consulta.ToListAsync();
+            int numeroRegistros = (int)pamRegistros.Value;
+            return new ModelEmpleadosOficio
+            {
+                Empleados = empleados,
+                NumeroRegistros = numeroRegistros
+            };
         }
     }
 }
