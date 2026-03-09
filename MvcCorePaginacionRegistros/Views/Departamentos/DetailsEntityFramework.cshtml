@@ -1,0 +1,49 @@
+﻿@model ModelEmpleadoDepartamento
+
+@{
+    ViewData["Title"] = "Details EF";
+    Departamento dept = ViewData["DEPT"] as Departamento;
+}
+<ul class="list-group">
+    <li class="list-group-item-danger"><strong>Id Departamento:</strong> @dept.IdDepartamento</li>
+    <li class="list-group-item-danger"><strong>Nombre Departamento:</strong> @dept.Nombre</li>
+    <li class="list-group-item-danger"><strong>Localidad Departamento:</strong> @dept.Localidad</li>
+</ul>
+@{
+    int numRegistros = 0;
+    int numPagina = 1;
+    int iddept = 0;
+    if (dept.IdDepartamento != null)
+    {
+        numRegistros = (int)Model.numRegistros;
+        iddept = dept.IdDepartamento;
+    }
+}
+
+<hr />
+@if (Model != null)
+{
+    <a asp-controller="Departamentos"
+       asp-action="DetailsEntityFramework"
+       asp-route-posicion="@ViewData["ANTERIOR"]"
+       asp-route-iddept="@iddept"
+       class="btn btn-success">Anterior</a>
+    <a asp-controller="Departamentos"
+       asp-action="DetailsEntityFramework"
+       asp-route-posicion="@ViewData["SIGUIENTE"]"
+       asp-route-iddept="@iddept"
+       class="btn btn-primary">Siguiente</a>
+    <a asp-controller="Departamentos"
+       asp-action="DetailsEntityFramework"
+       asp-route-posicion="@numRegistros"
+       asp-route-iddept="@iddept"
+       class="btn btn-dark">Ultimo</a>
+    <ul class="list-group">
+        <li class="list-group-item"><strong>IdEmpleado: </strong> @Model.Empleado.IdEmpleado</li>
+        <li class="list-group-item"><strong>Apellido: </strong> @Model.Empleado.Apellido</li>
+        <li class="list-group-item"><strong>Oficio: </strong> @Model.Empleado.Oficio</li>
+        <li class="list-group-item"><strong>Salario: </strong> @Model.Empleado.Salario</li>
+        <li class="list-group-item"><strong>IdDepartamento: </strong> @Model.Empleado.IdDepartamento</li>
+    </ul>
+}
+

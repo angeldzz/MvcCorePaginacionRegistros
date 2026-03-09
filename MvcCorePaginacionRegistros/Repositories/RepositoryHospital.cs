@@ -150,6 +150,25 @@ EXEC SP_GRUPO_EMPLEADOS_DEPARTAMENTO
                 NumeroRegistros = numeroRegistros
             };
         }
+        public async Task<ModelEmpleadoDepartamento> GetGrupoEmpleadosDepartamentosEFAsync(int posicion, int iddept)
+        {
+            Empleado empleado = await this.context.Empleados
+                .Where(e => e.IdDepartamento == iddept)
+                .Skip(posicion - 1)
+                .Take(1)
+                .FirstOrDefaultAsync();
+            int totalEmpleados = await this.context.Empleados
+                .Where(e => e.IdDepartamento == iddept)
+                .CountAsync();
+            Departamento departamento = await this.context.Departamentos
+                .FirstOrDefaultAsync(d => d.IdDepartamento == iddept);
+            return new ModelEmpleadoDepartamento
+            {
+                Empleado = empleado,
+                numRegistros = totalEmpleados,
+                Departamento = departamento
+            };
+        }
         public async Task<VistaDepartamento> GetVistaDepartamentoAsync(int posicion)
         {
             VistaDepartamento departamento =

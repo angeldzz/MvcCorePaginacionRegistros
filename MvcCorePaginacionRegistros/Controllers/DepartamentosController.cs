@@ -37,5 +37,31 @@ namespace MvcCorePaginacionRegistros.Controllers
             ViewData["SIGUIENTE"] = siguiente;
             return View(model);
         }
+        public async Task<IActionResult> DetailsEntityFramework(int? posicion,int iddept)
+        {
+            if (posicion == null)
+            {
+                posicion = 1;
+            }
+            ViewData["DEPT"] = await this.repo.FindDepartamentoAsync(iddept);
+            ModelEmpleadoDepartamento model = 
+                await this.repo.GetGrupoEmpleadosDepartamentosEFAsync((int)posicion, iddept);
+
+            int registros = await this.repo.GetEmpleadosDepartamentosCountAsync(iddept);
+            ViewData["REGISTROS"] = registros;
+            int anterior = (int)posicion - 1;
+            if (anterior == 0)
+            {
+                anterior = 1;
+            }
+            ViewData["ANTERIOR"] = anterior;
+            int siguiente = (int)posicion + 1;
+            if(siguiente > registros) 
+            {
+                siguiente = registros;
+            }
+            ViewData["SIGUIENTE"] = siguiente;
+            return View(model);
+        }
     }
 }
